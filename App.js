@@ -29,8 +29,8 @@ export default function App() {
 
   const RootStack = () => (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name='GettingDataScreen' component={GettingDataScreen} />
       <Stack.Screen name='DisplayDataScreen' component={DisplayDataScreen} />
+      <Stack.Screen name='GettingDataScreen' component={GettingDataScreen} />
     </Stack.Navigator>
   );
 
