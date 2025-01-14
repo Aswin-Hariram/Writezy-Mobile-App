@@ -28,7 +28,7 @@ export default function App() {
   const Stack = createNativeStackNavigator();
 
   const RootStack = () => (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator initialRouteName='GettingDataScreen' screenOptions={{ headerShown: false }}>
       <Stack.Screen name='DisplayDataScreen' component={DisplayDataScreen} />
       <Stack.Screen name='GettingDataScreen' component={GettingDataScreen} />
     </Stack.Navigator>

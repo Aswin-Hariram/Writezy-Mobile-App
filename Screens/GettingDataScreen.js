@@ -6,26 +6,63 @@ import { LinearGradient } from 'expo-linear-gradient';
 import LottieView from 'lottie-react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import AddKeywords from './AddKeywords';
+import { useNavigation } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 const GettingDataScreen = () => {
   const [keywordsVisible, setKeywordsVisible] = useState(false);
+  const [keywords, setKeywords] = useState([]);
+  const [inputText, setInputText] = useState('');
+  const [topic, setTopic] = useState('');
+  const navigation = useNavigation();
 
-  const toggleKeywords = () => setKeywordsVisible(!keywordsVisible);
+  const AddKeyword = () => {
+    if (topic.length !== 0) {
+      setKeywordsVisible(!keywordsVisible);
+    } else {
+      Toast.show({
+        type: 'info',
+        text1: 'Warning',
+        text2: 'Enter topic to add keyword',
+        swipeable: true,
+        autoHide: true,
+        visibilityTime: 3000, 
+        topOffset: Platform.OS === 'android' ? 50 : 70,        
+      });
+    }
+  }
+
+  const handleGenerate = () => {
+    if (topic.trim() === '') {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter a topic before generating.',
+        swipeable: true,
+        autoHide: true,
+        visibilityTime: 3000,
+        topOffset: Platform.OS === 'android' ? 70 : 90,
+      });
+      return;
+    }
+
+    console.log('TopicSent:', topic);
+    console.log('KeywordSent:', keywords);
+
+    navigation.navigate('DisplayDataScreen', {
+      Topic: topic,
+      Keywords: keywords,
+    });
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <LinearGradient
-        colors={['#c9def4', '#f5ccd4', '#b8a4c9']}
-        style={styles.background}
-      >
+      <LinearGradient colors={['#c9def4', '#f5ccd4', '#b8a4c9']} style={styles.background}>
         <SafeAreaView style={styles.container}>
-          {/* Header */}
           <View style={styles.header}>
-            <Feather name="menu" size={30} color="#333" style={styles.icon} />
-            <MaterialIcons name="exit-to-app" size={30} color="#333" style={styles.icon} />
+            <Feather name="menu" size={30} color="black" style={styles.icon} />
+            <MaterialIcons name="exit-to-app" size={30} color="black" style={styles.icon} />
           </View>
-
-          {/* Welcome Section */}
           <View style={styles.centerContent}>
             <View style={styles.txtContainer}>
               <Text style={styles.title}>AI Assistant</Text>
@@ -41,51 +78,57 @@ const GettingDataScreen = () => {
             <LottieView source={require("../assets/Animations/AI.json")} autoPlay loop style={styles.animation} />
           </View>
 
-          {/* Input Section */}
           <View style={{ paddingBottom: 15 }}>
-            <View
-              style={{
-                ...styles.txtInput,
-                borderBottomLeftRadius: !keywordsVisible ? 10 : 0,
-                borderBottomRightRadius: !keywordsVisible ? 10 : 0,
-                borderTopLeftRadius: 10,
-                borderTopRightRadius: 10,
-              }}
-            >
+            <View style={{
+              ...styles.txtInput,
+              borderBottomLeftRadius: !keywordsVisible ? 10 : 0,
+              borderBottomRightRadius: !keywordsVisible ? 10 : 0,
+              borderTopLeftRadius: 10,
+              borderTopRightRadius: 10,
+            }}>
               <TextInput
                 placeholder="Enter Topic..."
                 style={styles.input}
                 placeholderTextColor="#777"
+                onChangeText={setTopic}
+                value={topic}
               />
               <LinearGradient
                 colors={['#f9c58d', '#f492f0']}
                 style={styles.fabGradient}
               >
-                <TouchableOpacity style={styles.sendIcon}>
+                <TouchableOpacity style={styles.sendIcon} onPress={handleGenerate}>
                   <MaterialCommunityIcons name="send" size={24} color="white" />
                 </TouchableOpacity>
               </LinearGradient>
             </View>
 
-            {/* Keywords Section */}
             {!keywordsVisible ? (
               <Text
                 style={styles.addKeywordsText}
-                onPress={toggleKeywords}
+                onPress={AddKeyword}
               >
                 Add Keywords
               </Text>
             ) : (
               <View style={styles.keywordContainer}>
-                <AddKeywords setKeywordsVisible={setKeywordsVisible} />
+                <AddKeywords 
+                  setKeywordsVisible={setKeywordsVisible} 
+                  keywords={keywords} 
+                  setKeywords={setKeywords} 
+                  inputText={inputText} 
+                  setInputText={setInputText} 
+                />
               </View>
             )}
           </View>
         </SafeAreaView>
       </LinearGradient>
+      <Toast />
     </ScrollView>
   );
 };
+
 
 export default GettingDataScreen;
 
@@ -119,7 +162,7 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
-    padding:10
+    padding: 10
   },
   txtContainer: {
     alignItems: 'center',
