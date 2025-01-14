@@ -23,6 +23,20 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/Fonts/Delius-Regular.ttf",
+            "./assets/Fonts/Lexend-VariableFont_wght.ttf",
+            "./assets/Fonts/Zain-Black.ttf",
+            "./assets/Fonts/Zain-Italic.ttf",
+            "./assets/Fonts/Zain-Regular.ttf",
+          ]
+        }
+      ]
+    ]
   }
 }
