@@ -32,182 +32,184 @@ const DisplayDataScreen = () => {
     const [prompt, setPrompt] = useState('');
     const navigation = useNavigation();
     const route = useRoute();
+    const[edt,setedt]=useState(true);
 
     const { Topic = 'Default Topic', Keywords = [] } = route.params || {};
 
     const promptToCreatePrompt = `Generate a detailed and engaging prompt for creating an essay of approximately 200 words. The essay should be well-structured, concise, and written in an informative tone. The topic is "${Topic}", and it should incorporate the following keywords: "${Keywords}". Ensure the prompt encourages creativity and relevance while focusing on the main theme.`;
 
-    const fetchPrompt = async () => {
-        setLoading(true);
-        try {
-            const response = await fetch(`${API_URL}?key=${API_KEY}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [
-                        {
-                            parts: [{ text: promptToCreatePrompt }],
-                        },
-                    ],
-                }),
-            });
-            const data = await response.json();
-            if (response.ok) {
-                const generatedPrompt = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No prompt generated.';
-                setPrompt(generatedPrompt);
-            } else {
-                throw new Error(data.error?.message || 'Failed to generate prompt.');
-            }
-        } catch (error) {
-            console.error('Prompt Error:', error);
-            Alert.alert('Error', error.message || 'An error occurred while generating the prompt.');
-        } finally {
-            setLoading(false);
-        }
-    };
+     const fetchPrompt = async () => {
+    //     setLoading(true);
+    //     try {
+    //         const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+    //             method: 'POST',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify({
+    //                 contents: [
+    //                     {
+    //                         parts: [{ text: promptToCreatePrompt }],
+    //                     },
+    //                 ],
+    //             }),
+    //         });
+    //         const data = await response.json();
+    //         if (response.ok) {
+    //             const generatedPrompt = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No prompt generated.';
+    //             setPrompt(generatedPrompt);
+    //         } else {
+    //             throw new Error(data.error?.message || 'Failed to generate prompt.');
+    //         }
+    //     } catch (error) {
+    //         console.error('Prompt Error:', error);
+    //         Alert.alert('Error', error.message || 'An error occurred while generating the prompt.');
+    //     } finally {
+    //         setLoading(false);
+    //     }
+     };
 
-    const fetchGeneratedText = async () => {
-        setLoading(true);
-        try {
-            const response = await fetch(`${API_URL}?key=${API_KEY}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [
-                        {
-                            parts: [{ text: prompt }],
-                        },
-                    ],
-                }),
-            });
-            const data = await response.json();
-            if (response.ok) {
-                const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No content generated.';
-                setGeneratedText(text);
-            } else {
-                throw new Error(data.error?.message || 'Failed to generate text.');
-            }
-        } catch (error) {
-            console.error('Text Generation Error:', error);
-            Alert.alert('Error', error.message || 'An error occurred while generating the text.');
-        } finally {
-            setLoading(false);
-        }
-    };
+     const fetchGeneratedText = async () => {
+    //     setLoading(true);
+    //     try {
+    //         const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+    //             method: 'POST',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify({
+    //                 contents: [
+    //                     {
+    //                         parts: [{ text: prompt }],
+    //                     },
+    //                 ],
+    //             }),
+    //         });
+    //         const data = await response.json();
+    //         if (response.ok) {
+    //             const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No content generated.';
+    //             setGeneratedText(text);
+    //         } else {
+    //             throw new Error(data.error?.message || 'Failed to generate text.');
+    //         }
+    //     } catch (error) {
+    //         console.error('Text Generation Error:', error);
+    //         Alert.alert('Error', error.message || 'An error occurred while generating the text.');
+    //     } finally {
+    //         setLoading(false);
+    //     }
+     };
 
-    const editWithAI = async () => {
-        if (inputTextEdit.trim()) {
-            setLoading(true);
-            try {
-                const aiPrompt = `Contenet: ${generatedText}\n\nQuery: "${inputTextEdit.trim()}\n\n Words:200"`;
+     const editWithAI = async () => {
+        setedt(!edt);
+    //     if (inputTextEdit.trim()) {
+    //         setLoading(true);
+    //         try {
+    //             const aiPrompt = `Contenet: ${generatedText}\n\nQuery: "${inputTextEdit.trim()}\n\n Words:200"`;
 
-                const response = await fetch(`${API_URL}?key=${API_KEY}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [
-                            {
-                                parts: [{ text: aiPrompt }],
-                            },
-                        ],
-                    }),
-                });
+    //             const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+    //                 method: 'POST',
+    //                 headers: { 'Content-Type': 'application/json' },
+    //                 body: JSON.stringify({
+    //                     contents: [
+    //                         {
+    //                             parts: [{ text: aiPrompt }],
+    //                         },
+    //                     ],
+    //                 }),
+    //             });
 
-                const data = await response.json();
-                if (response.ok) {
-                    const enhancedText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No content generated.';
-                    setGeneratedText(enhancedText);
-                    setInputTextEdit(''); // Clear input after processing
-                } else {
-                    throw new Error(data.error?.message || 'Failed to enhance the text.');
-                }
-            } catch (error) {
-                console.error('AI Enhancement Error:', error);
-                Alert.alert('Error', error.message || 'An error occurred while enhancing the text.');
-            } finally {
-                setLoading(false);
-            }
-        } else {
-            Alert.alert('Validation Error', 'Please enter a valid text for AI editing.');
-        }
-    };
+    //             const data = await response.json();
+    //             if (response.ok) {
+    //                 const enhancedText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No content generated.';
+    //                 setGeneratedText(enhancedText);
+    //                 setInputTextEdit(''); // Clear input after processing
+    //             } else {
+    //                 throw new Error(data.error?.message || 'Failed to enhance the text.');
+    //             }
+    //         } catch (error) {
+    //             console.error('AI Enhancement Error:', error);
+    //             Alert.alert('Error', error.message || 'An error occurred while enhancing the text.');
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     } else {
+    //         Alert.alert('Validation Error', 'Please enter a valid text for AI editing.');
+    //     }
+     };
 
-    useEffect(() => {
-        if (Topic && Keywords) fetchPrompt();
-    }, [Topic, Keywords]);
+    // useEffect(() => {
+    //     if (Topic && Keywords) fetchPrompt();
+    // }, [Topic, Keywords]);
 
-    useEffect(() => {
-        if (prompt) fetchGeneratedText();
-    }, [prompt]);
+    // useEffect(() => {
+    //     if (prompt) fetchGeneratedText();
+    // }, [prompt]);
 
 
     const handleShare = async () => {
-        try {
-            if (!generatedText) {
-                Alert.alert('No Content', 'There is no content to share. Please generate or edit some text first.');
-                return;
-            }
+    //     try {
+    //         if (!generatedText) {
+    //             Alert.alert('No Content', 'There is no content to share. Please generate or edit some text first.');
+    //             return;
+    //         }
 
-            // Sanitize the file name to remove invalid characters
-            const sanitizedFileName = `${Topic.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+    //         // Sanitize the file name to remove invalid characters
+    //         const sanitizedFileName = `${Topic.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
 
-            // A4 page size in CSS: 210mm x 297mm
-            const htmlContent = `
-                <html>
-                    <head>
-                        <style>
-                            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); /* Include Roboto font */
+    //         // A4 page size in CSS: 210mm x 297mm
+    //         const htmlContent = `
+    //             <html>
+    //                 <head>
+    //                     <style>
+    //                         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); /* Include Roboto font */
                             
-                            @page {
-                                size: A4;
-                                margin: 20mm; /* Adjust margins as needed */
-                            }
-                            body {
-                                font-family: Arial, sans-serif;
-                                font-size: 14px;
-                                line-height: 1.5;
-                                word-wrap: break-word;
-                            }
-                            h1 {
-                                text-align: center;
-                                font-size: 20px;
-                                margin-bottom: 20px;
-                            }
-                            p {
-                                white-space: pre-wrap;
-                                word-wrap: break-word;
-                                font-family: 'Roboto', sans-serif; /* Use Roboto font for paragraphs */
-                                font-size: 14px;
-                                line-height: 1.6;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <h1>${Topic}</h1>
-                        <p>${generatedText}</p>
-                    </body>
-                </html>
-            `;
+    //                         @page {
+    //                             size: A4;
+    //                             margin: 20mm; /* Adjust margins as needed *editWithAI/
+    //                         }
+    //                         body {
+    //                             font-family: Arial, sans-serif;
+    //                             font-size: 14px;
+    //                             line-height: 1.5;
+    //                             word-wrap: break-word;
+    //                         }
+    //                         h1 {
+    //                             text-align: center;
+    //                             font-size: 20px;
+    //                             margin-bottom: 20px;
+    //                         }
+    //                         p {
+    //                             white-space: pre-wrap;
+    //                             word-wrap: break-word;
+    //                             font-family: 'Roboto', sans-serif; /* Use Roboto font for paragraphs */
+    //                             font-size: 14px;
+    //                             line-height: 1.6;
+    //                         }
+    //                     </style>
+    //                 </head>
+    //                 <body>
+    //                     <h1>${Topic}</h1>
+    //                     <p>${generatedText}</p>
+    //                 </body>
+    //             </html>
+    //         `;
 
-            // Generate the PDF file
-            const { uri } = await Print.printToFileAsync({
-                html: htmlContent,
-                fileName: sanitizedFileName,
-            });
+    //         // Generate the PDF file
+    //         const { uri } = await Print.printToFileAsync({
+    //             html: htmlContent,
+    //             fileName: sanitizedFileName,
+    //         });
 
-            console.log('PDF generated at:', uri);
+    //         console.log('PDF generated at:', uri);
 
-            // Share the generated PDF
-            if (await Sharing.isAvailableAsync()) {
-                await Sharing.shareAsync(uri);
-              //  Alert.alert('Success', `The PDF "${sanitizedFileName}" has been shared successfully!`);
-            } else {
-                Alert.alert('Sharing Unavailable', 'Sharing is not available on this device.');
-            }
-        } catch (error) {
-            console.error('Error sharing PDF:', error);
-            Alert.alert('Error', error.message || 'An error occurred while sharing the PDF.');
-        }
+    //         // Share the generated PDF
+    //         if (await Sharing.isAvailableAsync()) {
+    //             await Sharing.shareAsync(uri);
+    //           //  Alert.alert('Success', `The PDF "${sanitizedFileName}" has been shared successfully!`);
+    //         } else {
+    //             Alert.alert('Sharing Unavailable', 'Sharing is not available on this device.');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error sharing PDF:', error);
+    //         Alert.alert('Error', error.message || 'An error occurred while sharing the PDF.');
+    //     }
     };
 
 
@@ -238,7 +240,7 @@ const DisplayDataScreen = () => {
                     </ScrollView>
                 </View>
 
-                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.textbox}>
+                {edt && <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.textbox}>
                     <View style={styles.txtInput}>
                         <TextInput
                             value={inputTextEdit}
@@ -253,7 +255,19 @@ const DisplayDataScreen = () => {
                             </TouchableOpacity>
                         </LinearGradient>
                     </View>
-                </KeyboardAvoidingView>
+                </KeyboardAvoidingView>}
+                { !edt &&
+                <View style={styles.edt_buttons}>
+                    <TouchableOpacity style={[styles.btn,styles.discard]}>
+                       <Text style={[styles.txt,styles.dtxt]}>Discard</Text>
+                    </TouchableOpacity>
+                    <LinearGradient colors={['#f9c58d', '#f492f0']} style={{borderRadius:10}} >
+                            <TouchableOpacity  style={[styles.btn,styles.save]}>
+                              <Text style={styles.txt}>Save</Text>
+                            </TouchableOpacity>
+                        </LinearGradient>
+                </View>
+                 }
             </SafeAreaView>
         </LinearGradient>
     );
@@ -345,4 +359,26 @@ const styles = StyleSheet.create({
     },
     sendIcon: { height: 30, width: 30, justifyContent: 'center', alignItems: 'center' },
     loadingAnimation: { width: 150, height: 150 },
+    edt_buttons:{
+        flexDirection:'row',
+        marginTop:70,
+        gap:50
+    },
+   btn:{
+          width:150,
+          height:50,
+          borderRadius:10
+    },
+    txt:{
+        textAlign:'center',
+        color:'white',
+        lineHeight:50,
+        fontSize:20
+    },
+    discard:{
+        backgroundColor:'white',
+    },
+    dtxt:{
+        color:'black'
+    }
 });
