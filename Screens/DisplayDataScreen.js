@@ -41,8 +41,8 @@ const DisplayDataScreen = () => {
 
     const { Topic = 'Default Topic', Keywords = [] } = route.params || {};
     const [topic, setTopic] = useState(Topic)
-
-    const promptToCreatePrompt = `Generate a detailed and engaging prompt for creating an essay of approximately 200 words. The essay should be well-structured, concise, and written in an informative tone. The topic is "${Topic}", and it should incorporate the following keywords: "${Keywords}". Ensure the prompt encourages creativity and relevance while focusing on the main theme.`;
+    const [words, setWords] = useState(Platform.OS !== 'web' ? 300 : 1000)
+    const promptToCreatePrompt = `Generate a detailed and engaging prompt for creating an essay of approximately ${words} words. The essay should be well-structured, concise, and written in an informative tone. The topic is "${Topic}", and it should incorporate the following keywords: "${Keywords}". Ensure the prompt encourages creativity and relevance while focusing on the main theme.`;
 
     const fetchPrompt = async () => {
         setLoading(true);
@@ -109,7 +109,7 @@ const DisplayDataScreen = () => {
         if (inputTextEdit.trim()) {
             setLoading(true);
             try {
-                const aiPrompt = `Contenet: ${generatedText}\n\nQuery: "${inputTextEdit.trim()}\n\n Words:200"`;
+                const aiPrompt = `Contenet: ${generatedText}\n\nQuery: "${inputTextEdit.trim()}\n\n Words:${words}`;
 
                 const response = await fetch(`${API_URL}?key=${API_KEY}`, {
                     method: 'POST',
@@ -297,7 +297,7 @@ const DisplayDataScreen = () => {
                     >
                         <View style={styles.centeredContent}>
                             {loading ? (
-                                <LottieView
+                                Platform.OS === 'web' ? <Text style={styles.loadingText}>Loading...</Text> : <LottieView
                                     source={require('../assets/Animations/AiLoading.json')}
                                     autoPlay
                                     loop
@@ -355,7 +355,10 @@ export default DisplayDataScreen;
 
 // Styles
 const styles = StyleSheet.create({
-    container: { flex: 1, paddingTop: Platform.OS === 'android' ? 40 : 0 },
+    container: {
+        flex: 1,
+        paddingTop: Platform.OS === 'android' ? 40 : Platform.OS !== 'web' ? 0 : 40
+    },
     background: { flex: 1, alignItems: 'center' },
     backButton: {
         backgroundColor: 'white',
@@ -363,6 +366,13 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         elevation: 5,
     },
+    loadingText: {
+        fontSize: 18,
+        color: '#333',
+        textAlign: 'center',
+        marginTop: 20,
+    },
+
     headers: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -428,7 +438,7 @@ const styles = StyleSheet.create({
         elevation: 5,
         padding: 10,
     },
-    input: { flex: 1, fontSize: 16, color: '#333' },
+    input: { flex: 1, fontSize: 16, color: '#333', outlineStyle: 'none', },
     fabGradient: {
         borderRadius: 50,
         padding: 5,

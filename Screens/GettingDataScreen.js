@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, Platform, TextInput, ScrollView, TouchableOpacity, BackHandler, Alert } from 'react-native';
-import Feather from '@expo/vector-icons/Feather';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { StyleSheet, Text, View, SafeAreaView, Platform, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { MaterialIcons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import LottieView from 'lottie-react-native';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Toast from 'react-native-toast-message';
 import AddKeywords from './AddKeywords';
 import { useNavigation } from '@react-navigation/native';
-import Toast from 'react-native-toast-message';
 
 const GettingDataScreen = () => {
   const [keywordsVisible, setKeywordsVisible] = useState(false);
@@ -31,7 +28,7 @@ const GettingDataScreen = () => {
         topOffset: Platform.OS === 'android' ? 50 : 70,
       });
     }
-  }
+  };
 
   const handleGenerate = () => {
     // Validate input
@@ -61,19 +58,17 @@ const GettingDataScreen = () => {
     // Clear input fields after navigation
     setTopic('');
     setKeywords([]);
-    setKeywordsVisible(false)
+    setKeywordsVisible(false);
   };
-
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <LinearGradient colors={['#c9def4', '#f5ccd4', '#b8a4c9']} style={styles.background}>
         <SafeAreaView style={styles.container}>
           <View style={styles.headers}>
-            <TouchableOpacity style={styles.backButton} onPress={() =>Alert.alert("Alert","This feature will be added soon")}>
-            <MaterialIcons name="menu" size={24} color="gray" />
+            <TouchableOpacity style={styles.backButton} onPress={() => Alert.alert("Alert", "This feature will be added soon")}>
+              <MaterialIcons name="menu" size={24} color="gray" />
             </TouchableOpacity>
-
           </View>
           <View style={styles.centerContent}>
             <View style={styles.txtContainer}>
@@ -85,9 +80,12 @@ const GettingDataScreen = () => {
                 <Text style={styles.helloTxt}>
                   How can I <Text style={styles.highlight}>assist you?</Text>
                 </Text>
+                {
+                  Platform.OS !== 'web' && 
+                  <LottieView source={require("../assets/Animations/AI.json")} autoPlay loop style={styles.animation} />
+                }
               </View>
             </View>
-            <LottieView source={require("../assets/Animations/AI.json")} autoPlay loop style={styles.animation} />
           </View>
 
           <View style={{ paddingBottom: 15 }}>
@@ -103,7 +101,6 @@ const GettingDataScreen = () => {
                 style={styles.input}
                 placeholderTextColor="#777"
                 onChangeText={setTopic}
-
                 value={topic}
               />
               <LinearGradient
@@ -142,7 +139,6 @@ const GettingDataScreen = () => {
   );
 };
 
-
 export default GettingDataScreen;
 
 const styles = StyleSheet.create({
@@ -168,20 +164,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 18,
+    fontSize: Platform.OS === 'web' ? 40 : 18,
     fontWeight: 'bold',
     color: '#a18dce',
     textAlign: 'center',
     fontFamily: "Deli-Regular",
-    marginBottom: 15,
+    marginBottom: Platform.OS !== 'web' ? 15 : 0,
   },
   background: {
     flex: 1,
-    padding: 10
+    padding: 10,
   },
   backButton: {
     backgroundColor: 'white',
-    padding: Platform.OS==='android'?8:13,
+    padding: Platform.OS === 'android' ? 8 : 13,
     borderRadius: 50,
     elevation: 5,
   },
@@ -190,8 +186,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignContent: 'center',
     alignItems: 'center',
-    paddingLeft:Platform.OS==='android'?0:5,
-    paddingTop:10,
+    paddingLeft: Platform.OS === 'android' ? 0 : 5,
+    paddingTop: 10,
     marginBottom: 10,
   },
   txtContainer: {
@@ -201,7 +197,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   helloTxt: {
-    fontSize: 38,
+    fontSize: Platform.OS === 'web' ? 90 : 38,
     fontFamily: 'Zain-Bold',
     color: '#333',
     fontWeight: 600,
@@ -213,14 +209,17 @@ const styles = StyleSheet.create({
   txtInput: {
     backgroundColor: 'white',
     width: '100%',
-    paddingVertical: 5,
+    paddingVertical: Platform.OS !== 'web' ? 5 : 10,
     flexDirection: 'row',
     alignItems: 'center',
+    borderRadius: Platform.OS === 'web' ? 12 : 10,
+    boxShadow: Platform.OS === 'web' ? '0 4px 8px rgba(0, 0, 0, 0.1)' : 'none',
   },
   input: {
     flex: 1,
-    fontSize: 16,
+    fontSize: Platform.OS === 'web' ? 18 : 16,
     paddingHorizontal: 10,
+    outlineStyle: 'none',
     color: '#333',
   },
   sendIcon: {
@@ -255,7 +254,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#cccccc',
   },
   animation: {
-    width: 350,
-    height: 350,
+    width: Platform.OS === 'web' ? 300 : 350,
+    height: Platform.OS === 'web' ? 300 : 350,
   },
 });
