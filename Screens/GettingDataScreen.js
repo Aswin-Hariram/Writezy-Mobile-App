@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, Platform, TextInput, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, Platform, TextInput, ScrollView, TouchableOpacity, BackHandler } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import LottieView from 'lottie-react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AddKeywords from './AddKeywords';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
@@ -26,13 +27,14 @@ const GettingDataScreen = () => {
         text2: 'Enter topic to add keyword',
         swipeable: true,
         autoHide: true,
-        visibilityTime: 3000, 
-        topOffset: Platform.OS === 'android' ? 50 : 70,        
+        visibilityTime: 3000,
+        topOffset: Platform.OS === 'android' ? 50 : 70,
       });
     }
   }
 
   const handleGenerate = () => {
+    // Validate input
     if (topic.trim() === '') {
       Toast.show({
         type: 'error',
@@ -46,22 +48,32 @@ const GettingDataScreen = () => {
       return;
     }
 
+    // Debugging logs (optional; remove if not needed in production)
     console.log('TopicSent:', topic);
     console.log('KeywordSent:', keywords);
 
+    // Navigate to DisplayDataScreen and reset inputs
     navigation.navigate('DisplayDataScreen', {
       Topic: topic,
       Keywords: keywords,
     });
+
+    // Clear input fields after navigation
+    setTopic('');
+    setKeywords([]);
+    setKeywordsVisible(false)
   };
+
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <LinearGradient colors={['#c9def4', '#f5ccd4', '#b8a4c9']} style={styles.background}>
         <SafeAreaView style={styles.container}>
           <View style={styles.header}>
-            <Feather name="menu" size={30} color="black" style={styles.icon} />
-            <MaterialIcons name="exit-to-app" size={30} color="black" style={styles.icon} />
+            <Feather name="menu" size={30} color="gray" style={styles.icon} />
+            {/* <TouchableOpacity onPress={() => BackHandler.exitApp()}>
+              <MaterialIcons name="person" size={30} color="gray" style={styles.icon} />
+            </TouchableOpacity> */}
           </View>
           <View style={styles.centerContent}>
             <View style={styles.txtContainer}>
@@ -70,7 +82,7 @@ const GettingDataScreen = () => {
                 <Text style={styles.helloTxt}>
                   Hello there <Text style={styles.highlight}>human!</Text>
                 </Text>
-                <Text style={{ ...styles.helloTxt, fontSize: 43 }}>
+                <Text style={styles.helloTxt}>
                   How can I <Text style={styles.highlight}>assist you?</Text>
                 </Text>
               </View>
@@ -91,6 +103,7 @@ const GettingDataScreen = () => {
                 style={styles.input}
                 placeholderTextColor="#777"
                 onChangeText={setTopic}
+
                 value={topic}
               />
               <LinearGradient
@@ -98,7 +111,7 @@ const GettingDataScreen = () => {
                 style={styles.fabGradient}
               >
                 <TouchableOpacity style={styles.sendIcon} onPress={handleGenerate}>
-                  <MaterialCommunityIcons name="send" size={24} color="white" />
+                  <FontAwesome name="magic" size={20} color="white" />
                 </TouchableOpacity>
               </LinearGradient>
             </View>
@@ -112,12 +125,12 @@ const GettingDataScreen = () => {
               </Text>
             ) : (
               <View style={styles.keywordContainer}>
-                <AddKeywords 
-                  setKeywordsVisible={setKeywordsVisible} 
-                  keywords={keywords} 
-                  setKeywords={setKeywords} 
-                  inputText={inputText} 
-                  setInputText={setInputText} 
+                <AddKeywords
+                  setKeywordsVisible={setKeywordsVisible}
+                  keywords={keywords}
+                  setKeywords={setKeywords}
+                  inputText={inputText}
+                  setInputText={setInputText}
                 />
               </View>
             )}
@@ -136,8 +149,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: Platform.OS === 'android' ? 20 : 0,
-    paddingHorizontal: 15,
-    paddingBottom: 30,
+    paddingHorizontal: 5,
+    paddingBottom: 0,
     justifyContent: 'space-between',
   },
   scrollContainer: {
@@ -157,8 +170,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#6f7bf7',
+    color: '#a18dce',
     textAlign: 'center',
+    fontFamily: "Deli-Regular",
+    marginBottom: 15,
   },
   background: {
     flex: 1,
@@ -171,9 +186,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   helloTxt: {
-    fontSize: 43,
-    fontFamily: 'Zain-Regular',
+    fontSize: 38,
+    fontFamily: 'Zain-Bold',
     color: '#333',
+    fontWeight: 600,
     textAlign: 'center',
   },
   highlight: {
@@ -210,9 +226,10 @@ const styles = StyleSheet.create({
   addKeywordsText: {
     textAlign: 'right',
     marginRight: 10,
-    marginTop: 10,
+    marginTop: 15,
     fontWeight: 'bold',
-    color: 'white',
+    color: '#103783',
+    marginBottom: 5,
   },
   keywordContainer: {
     padding: 1,
@@ -223,7 +240,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#cccccc',
   },
   animation: {
-    width: 300,
-    height: 300,
+    width: 350,
+    height: 350,
   },
 });

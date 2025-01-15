@@ -17,10 +17,13 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Feather from '@expo/vector-icons/Feather';
 import LottieView from 'lottie-react-native';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
+import { API_KEY_GEMINI } from '../Config/APIConfig';
 
 // Constants
 const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
-const API_KEY = 'AIzaSyBy9cF4mrwkzNJvtR7Za_QbRInZxpjSDRs';
+const API_KEY = API_KEY_GEMINI;
 
 const DisplayDataScreen = () => {
     const [inputTextEdit, setInputTextEdit] = useState('');
@@ -96,7 +99,7 @@ const DisplayDataScreen = () => {
         if (inputTextEdit.trim()) {
             setLoading(true);
             try {
-                const aiPrompt = `${generatedText}\n\nEnhance the following text with improvements: "${inputTextEdit.trim()}"`;
+                const aiPrompt = `Contenet: ${generatedText}\n\nQuery: "${inputTextEdit.trim()}"`;
 
                 const response = await fetch(`${API_URL}?key=${API_KEY}`, {
                     method: 'POST',
@@ -137,6 +140,78 @@ const DisplayDataScreen = () => {
         if (prompt) fetchGeneratedText();
     }, [prompt]);
 
+
+    const handleShare = async () => {
+        try {
+            if (!generatedText) {
+                Alert.alert('No Content', 'There is no content to share. Please generate or edit some text first.');
+                return;
+            }
+
+            // Sanitize the file name to remove invalid characters
+            const sanitizedFileName = `${Topic.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+
+            // A4 page size in CSS: 210mm x 297mm
+            const htmlContent = `
+                <html>
+                    <head>
+                        <style>
+                            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); /* Include Roboto font */
+                            
+                            @page {
+                                size: A4;
+                                margin: 20mm; /* Adjust margins as needed */
+                            }
+                            body {
+                                font-family: Arial, sans-serif;
+                                font-size: 14px;
+                                line-height: 1.5;
+                                word-wrap: break-word;
+                            }
+                            h1 {
+                                text-align: center;
+                                font-size: 20px;
+                                margin-bottom: 20px;
+                            }
+                            p {
+                                white-space: pre-wrap;
+                                word-wrap: break-word;
+                                font-family: 'Roboto', sans-serif; /* Use Roboto font for paragraphs */
+                                font-size: 14px;
+                                line-height: 1.6;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>${Topic}</h1>
+                        <p>${generatedText}</p>
+                    </body>
+                </html>
+            `;
+
+            // Generate the PDF file
+            const { uri } = await Print.printToFileAsync({
+                html: htmlContent,
+                fileName: sanitizedFileName,
+            });
+
+            console.log('PDF generated at:', uri);
+
+            // Share the generated PDF
+            if (await Sharing.isAvailableAsync()) {
+                await Sharing.shareAsync(uri);
+              //  Alert.alert('Success', `The PDF "${sanitizedFileName}" has been shared successfully!`);
+            } else {
+                Alert.alert('Sharing Unavailable', 'Sharing is not available on this device.');
+            }
+        } catch (error) {
+            console.error('Error sharing PDF:', error);
+            Alert.alert('Error', error.message || 'An error occurred while sharing the PDF.');
+        }
+    };
+
+
+
     return (
         <LinearGradient colors={['#c9def4', '#f5ccd4', '#b8a4c9']} style={styles.container}>
             <SafeAreaView style={styles.background}>
@@ -145,7 +220,7 @@ const DisplayDataScreen = () => {
                         <MaterialCommunityIcons name="arrow-left" size={24} color="gray" />
                     </TouchableOpacity>
                     <Text style={styles.headerTitle}>Writezy</Text>
-                    <TouchableOpacity style={styles.shareButton} onPress={() => Alert.alert('Share', 'Share functionality coming soon!')}>
+                    <TouchableOpacity style={styles.shareButton} onPress={() => { handleShare() }}>
                         <Feather name="share" size={24} color="gray" />
                     </TouchableOpacity>
                 </View>
@@ -188,7 +263,7 @@ export default DisplayDataScreen;
 
 // Styles
 const styles = StyleSheet.create({
-    container: { flex: 1, paddingTop: Platform.OS === 'android' ? 20 : 0 },
+    container: { flex: 1, paddingTop: Platform.OS === 'android' ? 40 : 0 },
     background: { flex: 1, alignItems: 'center' },
     backButton: {
         backgroundColor: 'white',
@@ -199,6 +274,7 @@ const styles = StyleSheet.create({
     headers: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignContent: 'center',
         alignItems: 'center',
         width: '90%',
         marginBottom: 10,
@@ -216,7 +292,7 @@ const styles = StyleSheet.create({
     },
     txtArea: {
         backgroundColor: 'white',
-        height: '75%',
+        height: Platform.OS==='android'?'73%':'78%',
         width: '95%',
         padding: 15,
         marginTop: 15,
