@@ -16,8 +16,10 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Feather from '@expo/vector-icons/Feather';
+import AntDesign from '@expo/vector-icons/AntDesign';
 import LottieView from 'lottie-react-native';
 import * as Print from 'expo-print';
+
 import * as Sharing from 'expo-sharing';
 import { API_KEY_GEMINI } from '../Config/APIConfig';
 
@@ -30,187 +32,235 @@ const DisplayDataScreen = () => {
     const [generatedText, setGeneratedText] = useState('');
     const [loading, setLoading] = useState(false);
     const [prompt, setPrompt] = useState('');
+    const [prevData, setPrevData] = useState('')
     const navigation = useNavigation();
     const route = useRoute();
-    const[edt,setedt]=useState(true);
+    const [edt, setedt] = useState(true);
+    const [temp, setTemp] = useState('')
+    const [newDataVisible, setNewDataVisible] = useState(true)
 
     const { Topic = 'Default Topic', Keywords = [] } = route.params || {};
+    const [topic, setTopic] = useState(Topic)
 
     const promptToCreatePrompt = `Generate a detailed and engaging prompt for creating an essay of approximately 200 words. The essay should be well-structured, concise, and written in an informative tone. The topic is "${Topic}", and it should incorporate the following keywords: "${Keywords}". Ensure the prompt encourages creativity and relevance while focusing on the main theme.`;
 
-     const fetchPrompt = async () => {
-    //     setLoading(true);
-    //     try {
-    //         const response = await fetch(`${API_URL}?key=${API_KEY}`, {
-    //             method: 'POST',
-    //             headers: { 'Content-Type': 'application/json' },
-    //             body: JSON.stringify({
-    //                 contents: [
-    //                     {
-    //                         parts: [{ text: promptToCreatePrompt }],
-    //                     },
-    //                 ],
-    //             }),
-    //         });
-    //         const data = await response.json();
-    //         if (response.ok) {
-    //             const generatedPrompt = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No prompt generated.';
-    //             setPrompt(generatedPrompt);
-    //         } else {
-    //             throw new Error(data.error?.message || 'Failed to generate prompt.');
-    //         }
-    //     } catch (error) {
-    //         console.error('Prompt Error:', error);
-    //         Alert.alert('Error', error.message || 'An error occurred while generating the prompt.');
-    //     } finally {
-    //         setLoading(false);
-    //     }
-     };
+    const fetchPrompt = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [
+                        {
+                            parts: [{ text: promptToCreatePrompt }],
+                        },
+                    ],
+                }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                const generatedPrompt = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No prompt generated.';
+                setPrompt(generatedPrompt);
+            } else {
+                throw new Error(data.error?.message || 'Failed to generate prompt.');
+            }
+        } catch (error) {
+            console.error('Prompt Error:', error);
+            Alert.alert('Error', error.message || 'An error occurred while generating the prompt.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-     const fetchGeneratedText = async () => {
-    //     setLoading(true);
-    //     try {
-    //         const response = await fetch(`${API_URL}?key=${API_KEY}`, {
-    //             method: 'POST',
-    //             headers: { 'Content-Type': 'application/json' },
-    //             body: JSON.stringify({
-    //                 contents: [
-    //                     {
-    //                         parts: [{ text: prompt }],
-    //                     },
-    //                 ],
-    //             }),
-    //         });
-    //         const data = await response.json();
-    //         if (response.ok) {
-    //             const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No content generated.';
-    //             setGeneratedText(text);
-    //         } else {
-    //             throw new Error(data.error?.message || 'Failed to generate text.');
-    //         }
-    //     } catch (error) {
-    //         console.error('Text Generation Error:', error);
-    //         Alert.alert('Error', error.message || 'An error occurred while generating the text.');
-    //     } finally {
-    //         setLoading(false);
-    //     }
-     };
+    const fetchGeneratedText = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [
+                        {
+                            parts: [{ text: prompt }],
+                        },
+                    ],
+                }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No content generated.';
+                setGeneratedText(text);
+            } else {
+                throw new Error(data.error?.message || 'Failed to generate text.');
+            }
+        } catch (error) {
+            console.error('Text Generation Error:', error);
+            Alert.alert('Error', error.message || 'An error occurred while generating the text.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-     const editWithAI = async () => {
+    const editWithAI = async () => {
         setedt(!edt);
-    //     if (inputTextEdit.trim()) {
-    //         setLoading(true);
-    //         try {
-    //             const aiPrompt = `Contenet: ${generatedText}\n\nQuery: "${inputTextEdit.trim()}\n\n Words:200"`;
+        if (inputTextEdit.trim()) {
+            setLoading(true);
+            try {
+                const aiPrompt = `Contenet: ${generatedText}\n\nQuery: "${inputTextEdit.trim()}\n\n Words:200"`;
 
-    //             const response = await fetch(`${API_URL}?key=${API_KEY}`, {
-    //                 method: 'POST',
-    //                 headers: { 'Content-Type': 'application/json' },
-    //                 body: JSON.stringify({
-    //                     contents: [
-    //                         {
-    //                             parts: [{ text: aiPrompt }],
-    //                         },
-    //                     ],
-    //                 }),
-    //             });
+                const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [
+                            {
+                                parts: [{ text: aiPrompt }],
+                            },
+                        ],
+                    }),
+                });
 
-    //             const data = await response.json();
-    //             if (response.ok) {
-    //                 const enhancedText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No content generated.';
-    //                 setGeneratedText(enhancedText);
-    //                 setInputTextEdit(''); // Clear input after processing
-    //             } else {
-    //                 throw new Error(data.error?.message || 'Failed to enhance the text.');
-    //             }
-    //         } catch (error) {
-    //             console.error('AI Enhancement Error:', error);
-    //             Alert.alert('Error', error.message || 'An error occurred while enhancing the text.');
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     } else {
-    //         Alert.alert('Validation Error', 'Please enter a valid text for AI editing.');
-    //     }
-     };
+                const data = await response.json();
+                if (response.ok) {
+                    const enhancedText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No content generated.';
+                    setPrevData(generatedText)
+                    setGeneratedText(enhancedText);
+                    setInputTextEdit(''); // Clear input after processing
+                } else {
+                    throw new Error(data.error?.message || 'Failed to enhance the text.');
+                }
+            } catch (error) {
+                console.error('AI Enhancement Error:', error);
+                Alert.alert('Error', error.message || 'An error occurred while enhancing the text.');
+            } finally {
+                setLoading(false);
+                setTopic(Topic + "(new version)")
+            }
+        } else {
+            Alert.alert('Validation Error', 'Please enter a valid text for AI editing.');
+        }
+    };
 
-    // useEffect(() => {
-    //     if (Topic && Keywords) fetchPrompt();
-    // }, [Topic, Keywords]);
+    useEffect(() => {
+        if (Topic && Keywords) fetchPrompt();
+    }, [Topic, Keywords]);
 
-    // useEffect(() => {
-    //     if (prompt) fetchGeneratedText();
-    // }, [prompt]);
+    useEffect(() => {
+        if (prompt) fetchGeneratedText();
+    }, [prompt]);
 
 
     const handleShare = async () => {
-    //     try {
-    //         if (!generatedText) {
-    //             Alert.alert('No Content', 'There is no content to share. Please generate or edit some text first.');
-    //             return;
-    //         }
+        try {
+            if (!generatedText) {
+                Alert.alert('No Content', 'There is no content to share. Please generate or edit some text first.');
+                return;
+            }
 
-    //         // Sanitize the file name to remove invalid characters
-    //         const sanitizedFileName = `${Topic.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+            // Sanitize the file name to remove invalid characters
+            const sanitizedFileName = `${Topic.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
 
-    //         // A4 page size in CSS: 210mm x 297mm
-    //         const htmlContent = `
-    //             <html>
-    //                 <head>
-    //                     <style>
-    //                         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); /* Include Roboto font */
+            // A4 page size in CSS: 210mm x 297mm
+            const htmlContent = `
+                <html>
+                    <head>
+                        <style>
+                            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); /* Include Roboto font */
                             
-    //                         @page {
-    //                             size: A4;
-    //                             margin: 20mm; /* Adjust margins as needed *editWithAI/
-    //                         }
-    //                         body {
-    //                             font-family: Arial, sans-serif;
-    //                             font-size: 14px;
-    //                             line-height: 1.5;
-    //                             word-wrap: break-word;
-    //                         }
-    //                         h1 {
-    //                             text-align: center;
-    //                             font-size: 20px;
-    //                             margin-bottom: 20px;
-    //                         }
-    //                         p {
-    //                             white-space: pre-wrap;
-    //                             word-wrap: break-word;
-    //                             font-family: 'Roboto', sans-serif; /* Use Roboto font for paragraphs */
-    //                             font-size: 14px;
-    //                             line-height: 1.6;
-    //                         }
-    //                     </style>
-    //                 </head>
-    //                 <body>
-    //                     <h1>${Topic}</h1>
-    //                     <p>${generatedText}</p>
-    //                 </body>
-    //             </html>
-    //         `;
+                            @page {
+                                size: A4;
+                                margin: 20mm; /* Adjust margins as needed *editWithAI/
+                            }
+                            body {
+                                font-family: Arial, sans-serif;
+                                font-size: 14px;
+                                line-height: 1.5;
+                                word-wrap: break-word;
+                                
+                            }
+                            h1 {
+                                text-align: center;
+                                font-size: 20px;
+                                margin-bottom: 20px;
+                            }
+                            p {
+                                white-space: pre-wrap;
+                                word-wrap: break-word;
+                                font-family: 'Roboto', sans-serif; /* Use Roboto font for paragraphs */
+                                font-size: 14px;
+                                line-height: 1.6;
+                                text-align: justify;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>${topic}</h1>
+                        <p>${generatedText}</p>
+                    </body>
+                </html>
+            `;
 
-    //         // Generate the PDF file
-    //         const { uri } = await Print.printToFileAsync({
-    //             html: htmlContent,
-    //             fileName: sanitizedFileName,
-    //         });
+            // Generate the PDF file
+            const { uri } = await Print.printToFileAsync({
+                html: htmlContent,
+                fileName: sanitizedFileName,
+            });
 
-    //         console.log('PDF generated at:', uri);
+            console.log('PDF generated at:', uri);
 
-    //         // Share the generated PDF
-    //         if (await Sharing.isAvailableAsync()) {
-    //             await Sharing.shareAsync(uri);
-    //           //  Alert.alert('Success', `The PDF "${sanitizedFileName}" has been shared successfully!`);
-    //         } else {
-    //             Alert.alert('Sharing Unavailable', 'Sharing is not available on this device.');
-    //         }
-    //     } catch (error) {
-    //         console.error('Error sharing PDF:', error);
-    //         Alert.alert('Error', error.message || 'An error occurred while sharing the PDF.');
-    //     }
+            // Share the generated PDF
+            if (await Sharing.isAvailableAsync()) {
+                await Sharing.shareAsync(uri);
+                //  Alert.alert('Success', `The PDF "${sanitizedFileName}" has been shared successfully!`);
+            } else {
+                Alert.alert('Sharing Unavailable', 'Sharing is not available on this device.');
+            }
+        } catch (error) {
+            console.error('Error sharing PDF:', error);
+            Alert.alert('Error', error.message || 'An error occurred while sharing the PDF.');
+        }
     };
+
+    const handleDiscard = () => {
+
+        Alert.alert("Are you sure?", "Do you want to discard new changes", [
+            {
+                text: "No",
+                onPress: () => {
+                }
+            },
+            {
+                text: "Yes",
+                onPress: () => {
+                    setGeneratedText(prevData)
+                    setedt(true)
+                    setTopic(Topic)
+                }
+            }
+        ])
+    }
+
+    const handleSave = () => {
+        setPrevData('')
+        setedt(true)
+        setTopic(Topic)
+    }
+    const handleLongPress = () => {
+        if (!edt) {
+            if (newDataVisible) {
+                setTemp(generatedText); // Store the current generated text in temp
+                setGeneratedText(prevData);
+                setTopic(Topic + " (old version)") // Display the previous data
+            } else {
+                setGeneratedText(temp);
+                setTopic(Topic + " (new version)")  // Revert to the temporary stored data
+            }
+            setNewDataVisible(!newDataVisible);
+
+        }
+    };
+
 
 
 
@@ -222,23 +272,43 @@ const DisplayDataScreen = () => {
                         <MaterialCommunityIcons name="arrow-left" size={24} color="gray" />
                     </TouchableOpacity>
                     <Text style={styles.headerTitle}>Writezy</Text>
-                    <TouchableOpacity style={styles.shareButton} onPress={() => { handleShare() }}>
-                        <Feather name="share" size={24} color="gray" />
-                    </TouchableOpacity>
+                    {
+                        edt ? <TouchableOpacity style={styles.shareButton} onPress={() => { handleShare() }}>
+                            <Feather name="share" size={24} color="gray" />
+                        </TouchableOpacity> :
+                            <TouchableOpacity style={styles.shareButton} onPress={handleLongPress}>
+                                <AntDesign name="swap" size={24} color="gray" />
+                            </TouchableOpacity>
+                    }
                 </View>
 
                 <View style={styles.txtArea}>
-                    <Text style={styles.outputLabel}>{Topic}</Text>
-                    <ScrollView contentContainerStyle={styles.scrollViewContent} showsVerticalScrollIndicator={false}>
+                    <Text style={styles.outputLabel}>{topic}</Text>
+                    <ScrollView
+                        contentContainerStyle={{
+                            flexGrow: 1, // Ensures content inside the ScrollView can grow
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
+                        showsVerticalScrollIndicator={false}
+                        style={{ flex: 1 }} // Ensures ScrollView takes up the available space
+                    >
                         <View style={styles.centeredContent}>
                             {loading ? (
-                                <LottieView source={require('../assets/Animations/AiLoading.json')} autoPlay loop style={styles.loadingAnimation} />
+                                <LottieView
+                                    source={require('../assets/Animations/AiLoading.json')}
+                                    autoPlay
+                                    loop
+                                    style={styles.loadingAnimation}
+                                />
                             ) : (
                                 <Text style={styles.txtAreaText}>{generatedText || 'No content available.'}</Text>
                             )}
                         </View>
                     </ScrollView>
                 </View>
+
+
 
                 {edt && <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.textbox}>
                     <View style={styles.txtInput}>
@@ -256,18 +326,24 @@ const DisplayDataScreen = () => {
                         </LinearGradient>
                     </View>
                 </KeyboardAvoidingView>}
-                { !edt &&
-                <View style={styles.edt_buttons}>
-                    <TouchableOpacity style={[styles.btn,styles.discard]}>
-                       <Text style={[styles.txt,styles.dtxt]}>Discard</Text>
-                    </TouchableOpacity>
-                    <LinearGradient colors={['#f9c58d', '#f492f0']} style={{borderRadius:10}} >
-                            <TouchableOpacity  style={[styles.btn,styles.save]}>
-                              <Text style={styles.txt}>Save</Text>
+                {!edt &&
+                    <View style={styles.edt_buttons}>
+                        <LinearGradient colors={['#ed5871', '#ed5871']} start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={[styles.gradient, styles.btn]}>
+                            <TouchableOpacity style={styles.btn} onPress={handleDiscard} >
+                                <Text style={styles.txt}>Dicard</Text>
                             </TouchableOpacity>
                         </LinearGradient>
-                </View>
-                 }
+                        <LinearGradient colors={['#e68b29', '#f059ea']} start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }} style={[styles.gradient, styles.btn]}>
+                            <TouchableOpacity style={styles.btn} onPress={handleSave} >
+                                <Text style={styles.txt}>Save</Text>
+                            </TouchableOpacity>
+                        </LinearGradient>
+                    </View>
+
+                }
             </SafeAreaView>
         </LinearGradient>
     );
@@ -306,7 +382,7 @@ const styles = StyleSheet.create({
     },
     txtArea: {
         backgroundColor: 'white',
-        height: Platform.OS==='android'?'73%':'78%',
+        height: Platform.OS === 'android' ? '73%' : '78%',
         width: '95%',
         padding: 15,
         marginTop: 15,
@@ -359,26 +435,35 @@ const styles = StyleSheet.create({
     },
     sendIcon: { height: 30, width: 30, justifyContent: 'center', alignItems: 'center' },
     loadingAnimation: { width: 150, height: 150 },
-    edt_buttons:{
-        flexDirection:'row',
-        marginTop:70,
-        gap:50
+    edt_buttons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 50,
+        marginBottom: 20,
+        paddingHorizontal: 20, // Adjust padding as needed
     },
-   btn:{
-          width:150,
-          height:50,
-          borderRadius:10
+    btn: {
+        flex: 1,
+        height: 50,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginHorizontal: 10, // Add spacing between buttons
     },
-    txt:{
-        textAlign:'center',
-        color:'white',
-        lineHeight:50,
-        fontSize:20
+    txt: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 700,
+        fontFamily: 'Delius-Regular'
     },
-    discard:{
-        backgroundColor:'white',
+    discard: {
+        backgroundColor: 'white',
     },
-    dtxt:{
-        color:'black'
-    }
+    dtxt: {
+        color: 'black',
+    },
+    gradient: {
+        borderRadius: 10,
+    },
 });
