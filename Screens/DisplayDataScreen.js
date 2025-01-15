@@ -99,7 +99,7 @@ const DisplayDataScreen = () => {
         if (inputTextEdit.trim()) {
             setLoading(true);
             try {
-                const aiPrompt = `Contenet: ${generatedText}\n\nQuery: "${inputTextEdit.trim()}"`;
+                const aiPrompt = `Contenet: ${generatedText}\n\nQuery: "${inputTextEdit.trim()}\n\n Words:200"`;
 
                 const response = await fetch(`${API_URL}?key=${API_KEY}`, {
                     method: 'POST',
