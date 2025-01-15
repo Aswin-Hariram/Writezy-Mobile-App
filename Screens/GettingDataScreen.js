@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, Platform, TextInput, ScrollView, TouchableOpacity, BackHandler } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, Platform, TextInput, ScrollView, TouchableOpacity, BackHandler, Alert } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -69,11 +69,11 @@ const GettingDataScreen = () => {
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <LinearGradient colors={['#c9def4', '#f5ccd4', '#b8a4c9']} style={styles.background}>
         <SafeAreaView style={styles.container}>
-          <View style={styles.header}>
-            <Feather name="menu" size={30} color="gray" style={styles.icon} />
-            {/* <TouchableOpacity onPress={() => BackHandler.exitApp()}>
-              <MaterialIcons name="person" size={30} color="gray" style={styles.icon} />
-            </TouchableOpacity> */}
+          <View style={styles.headers}>
+            <TouchableOpacity style={styles.backButton} onPress={() =>Alert.alert("Alert","This feature will be added soon")}>
+            <MaterialIcons name="menu" size={24} color="gray" />
+            </TouchableOpacity>
+
           </View>
           <View style={styles.centerContent}>
             <View style={styles.txtContainer}>
@@ -178,6 +178,21 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     padding: 10
+  },
+  backButton: {
+    backgroundColor: 'white',
+    padding: Platform.OS==='android'?8:13,
+    borderRadius: 50,
+    elevation: 5,
+  },
+  headers: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignContent: 'center',
+    alignItems: 'center',
+    paddingLeft:Platform.OS==='android'?0:5,
+    paddingTop:10,
+    marginBottom: 10,
   },
   txtContainer: {
     alignItems: 'center',
