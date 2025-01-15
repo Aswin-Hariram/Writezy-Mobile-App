@@ -47,6 +47,7 @@ const DisplayDataScreen = () => {
     const fetchPrompt = async () => {
         setLoading(true);
         try {
+            console.log("Fetching prompt...")
             const response = await fetch(`${API_URL}?key=${API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -66,7 +67,7 @@ const DisplayDataScreen = () => {
                 throw new Error(data.error?.message || 'Failed to generate prompt.');
             }
         } catch (error) {
-            console.error('Prompt Error:', error);
+            console.log('Prompt Error:', error);
             Alert.alert('Error', error.message || 'An error occurred while generating the prompt.');
         } finally {
             setLoading(false);
@@ -76,6 +77,7 @@ const DisplayDataScreen = () => {
     const fetchGeneratedText = async () => {
         setLoading(true);
         try {
+            console.log("Fetching essay...")
             const response = await fetch(`${API_URL}?key=${API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -95,7 +97,7 @@ const DisplayDataScreen = () => {
                 throw new Error(data.error?.message || 'Failed to generate text.');
             }
         } catch (error) {
-            console.error('Text Generation Error:', error);
+            console.log('Text Generation Error:', error);
             Alert.alert('Error', error.message || 'An error occurred while generating the text.');
         } finally {
             setLoading(false);
@@ -131,7 +133,7 @@ const DisplayDataScreen = () => {
                     throw new Error(data.error?.message || 'Failed to enhance the text.');
                 }
             } catch (error) {
-                console.error('AI Enhancement Error:', error);
+                console.log('AI Enhancement Error:', error);
                 Alert.alert('Error', error.message || 'An error occurred while enhancing the text.');
             } finally {
                 setLoading(false);
@@ -217,7 +219,7 @@ const DisplayDataScreen = () => {
                 Alert.alert('Sharing Unavailable', 'Sharing is not available on this device.');
             }
         } catch (error) {
-            console.error('Error sharing PDF:', error);
+            console.log('Error sharing PDF:', error);
             Alert.alert('Error', error.message || 'An error occurred while sharing the PDF.');
         }
     };
@@ -332,7 +334,7 @@ const DisplayDataScreen = () => {
                             end={{ x: 1, y: 1 }}
                             style={[styles.gradient, styles.btn]}>
                             <TouchableOpacity style={styles.btn} onPress={handleDiscard} >
-                                <Text style={styles.txt}>Dicard</Text>
+                                <Text style={styles.txt}>Discard</Text>
                             </TouchableOpacity>
                         </LinearGradient>
                         <LinearGradient colors={['#e68b29', '#f059ea']} start={{ x: 0, y: 0 }}
@@ -382,7 +384,7 @@ const styles = StyleSheet.create({
     },
     txtArea: {
         backgroundColor: 'white',
-        height: Platform.OS === 'android' ? '73%' : '78%',
+        height: Platform.OS === 'android' ? '75%' : '78%',
         width: '95%',
         padding: 15,
         marginTop: 15,
@@ -416,7 +418,7 @@ const styles = StyleSheet.create({
         color: '#333',
         textAlign: 'justify',
     },
-    textbox: { position: 'absolute', bottom: 50, width: '90%' },
+    textbox: { position: 'absolute', bottom: 30, width: '94%' },
     txtInput: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -439,7 +441,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 50,
+        marginTop: 30,
         marginBottom: 20,
         paddingHorizontal: 20, // Adjust padding as needed
     },

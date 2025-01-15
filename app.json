@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.aswin_hariram.Writezy"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -33,7 +34,7 @@
             "./assets/Fonts/Lexend-VariableFont_wght.ttf",
             "./assets/Fonts/Zain-Black.ttf",
             "./assets/Fonts/Zain-Italic.ttf",
-            "./assets/Fonts/Zain-Regular.ttf",
+            "./assets/Fonts/Zain-Regular.ttf"
           ]
         }
       ]
